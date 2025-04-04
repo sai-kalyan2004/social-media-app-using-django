@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="post-container">
+  <div class="form-header">
+    <h2 class="post-title">Create a New Post</h2>
+    <p class="subtitle">Share your moments with the world</p>
+  </div>
+
+  <form method="post" enctype="multipart/form-data" class="post-form">
+    {% csrf_token %}
+
+    <div class="form-group">
+      <div class="image-upload-container">
+        <label for="{{ form.image.id_for_label }}" class="image-upload-label">
+          <div class="upload-icon">📸</div>
+          <span>Choose a photo</span>
+          <span class="upload-hint">Click to upload</span>
+        </label>
+        {{ form.image }}
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="{{ form.caption.id_for_label }}" class="caption-label">Write a caption</label>
+      {{ form.caption }}
+    </div>
+
+    <button type="submit" class="post-btn">
+      <span class="btn-text">Share Post</span>
+      <span class="btn-icon">✨</span>
+    </button>
+  </form>
+</div>
+
+<style>
+  body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f6f9fc 0%, #edf2f7 100%);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: #2d3748;
+    line-height: 1.5;
+  }
+
+  .post-container {
+    width: 90%;
+    max-width: 600px;
+    margin: 40px auto;
+    background: white;
+    padding: 2rem;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    backdrop-filter: blur(10px);
+  }
+
+  .form-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+
+  .post-title {
+    font-size: 2rem;
+    font-weight: 700;
+    background: linear-gradient(to right, #4f46e5, #7c3aed);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    margin-bottom: 0.5rem;
+  }
+
+  .subtitle {
+    color: #6b7280;
+    font-size: 1rem;
+  }
+
+  .post-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .image-upload-container {
+    border: 2px dashed #e2e8f0;
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+  }
+
+  .image-upload-container:hover {
+    border-color: #4f46e5;
+    background: #f8fafc;
+  }
+
+  .image-upload-label {
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .upload-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .upload-hint {
+    font-size: 0.875rem;
+    color: #6b7280;
+  }
+
+  input[type="file"] {
+    display: none;
+  }
+
+  .caption-label {
+    font-weight: 600;
+    color: #4a5568;
+    font-size: 0.875rem;
+  }
+
+  textarea {
+    width: 100%;
+    min-height: 120px;
+    padding: 1rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    resize: vertical;
+  }
+
+  textarea:focus {
+    outline: none;
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+  }
+
+  .post-btn {
+    background: linear-gradient(to right, #4f46e5, #7c3aed);
+    color: white;
+    padding: 1rem;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  .post-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+  }
+
+  .post-btn:active {
+    transform: translateY(0);
+  }
+
+  .btn-text {
+    letter-spacing: 0.5px;
+  }
+
+  .btn-icon {
+    font-size: 1.25rem;
+  }
+
+  @media (max-width: 640px) {
+    .post-container {
+      width: 95%;
+      padding: 1.5rem;
+      margin: 20px auto;
+    }
+
+    .post-title {
+      font-size: 1.75rem;
+    }
+
+    .image-upload-container {
+      padding: 1.5rem;
+    }
+  }
+</style>
+{% endblock %}

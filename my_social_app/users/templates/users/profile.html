@@ -1,0 +1,578 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="profile-container">
+    <div class="profile-header">
+        <div class="profile-cover-wrapper">
+            <div class="profile-cover">
+                <div class="cover-gradient"></div>
+            </div>
+            <div class="profile-main">
+                <div class="profile-avatar-wrapper">
+                    {% if user.profile_picture %}
+                        <img src="{{ user.profile_picture.url }}" alt="Profile Picture" class="profile-avatar">
+                    {% else %}
+                        <img src="{% static 'images/default-profile.png' %}" alt="Default Profile Picture" class="profile-avatar">
+                    {% endif %}
+                </div>
+                <div class="profile-info">
+                    <div class="profile-top">
+                        <h1 class="profile-name">{{ user.username }}</h1>
+                        <div class="profile-actions">
+                            <a href="{% url 'edit_profile' %}" class="btn btn-primary">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                </svg>
+                                Edit Profile
+                            </a>
+                            <form action="{% url 'delete_profile' %}" method="POST" class="delete-form">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M3 6h18"></path>
+                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
+                                        <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                    </svg>
+                                    Delete Profile
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="profile-meta">
+                        {% if user.location %}
+                        <div class="meta-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                <circle cx="12" cy="10" r="3"></circle>
+                            </svg>
+                            <span>{{ user.location }}</span>
+                        </div>
+                        {% endif %}
+                        <div class="meta-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                            </svg>
+                            <span>{{ user.posts.count }} Posts</span>
+                        </div>
+                    </div>
+
+                    {% if user.bio %}
+                    <div class="profile-bio">
+                        <p>{{ user.bio }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <div class="section-header">
+            <h2>Posts</h2>
+            <a href="{% url 'create_post' %}" class="btn btn-secondary">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                New Post
+            </a>
+        </div>
+
+        {% if user.posts.all %}
+        <div class="posts-grid">
+            {% for post in user.posts.all %}
+            <div class="post-card">
+                <div class="post-header">
+                    <div class="post-author">
+                        {% if user.profile_picture %}
+                            <img src="{{ user.profile_picture.url }}" alt="" class="author-avatar">
+                        {% else %}
+                            <img src="{% static 'images/default-profile.png' %}" alt="" class="author-avatar">
+                        {% endif %}
+                        <div class="author-info">
+                            <h3>{{ post.user.username }}</h3>
+                            <span>{{ post.created_at|timesince }} ago</span>
+                        </div>
+                    </div>
+                    <div class="post-actions dropdown">
+                        <button class="dropdown-trigger">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="1"></circle>
+                                <circle cx="12" cy="5" r="1"></circle>
+                                <circle cx="12" cy="19" r="1"></circle>
+                            </svg>
+                        </button>
+                        <div class="dropdown-menu">
+                            <form action="{% url 'delete_post' post.id %}" method="POST">
+                                {% csrf_token %}
+                                <button type="submit" class="dropdown-item text-danger">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M3 6h18"></path>
+                                        <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                                        <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                                    </svg>
+                                    Delete
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                {% if post.image %}
+                <div class="post-image">
+                    <img src="{{ post.image.url }}" alt="Post Image">
+                </div>
+                {% endif %}
+
+                <div class="post-content">
+                    <p>{{ post.caption }}</p>
+                </div>
+
+                <div class="post-footer">
+                    <button class="like-btn">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                        </svg>
+                        <span>{{ post.likes.count }}</span>
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                    <circle cx="12" cy="13" r="4"></circle>
+                </svg>
+            </div>
+            <h3>No Posts Yet</h3>
+            <p>Share your first moment with the world</p>
+            <a href="{% url 'create_post' %}" class="btn btn-primary">Create Your First Post</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary-color: #0ea5e9;
+        --primary-dark: #0284c7;
+        --danger-color: #ef4444;
+        --danger-dark: #dc2626;
+        --text-primary: #1f2937;
+        --text-secondary: #4b5563;
+        --bg-primary: #ffffff;
+        --bg-secondary: #f3f4f6;
+        --border-color: #e5e7eb;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    }
+
+    .profile-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .profile-header {
+        background: var(--bg-primary);
+        border-radius: 1rem;
+        overflow: hidden;
+        box-shadow: var(--shadow-lg);
+        margin-bottom: 2rem;
+    }
+
+    .profile-cover-wrapper {
+        position: relative;
+    }
+
+    .profile-cover {
+    height: 200px;
+    background: linear-gradient(135deg, #ec4899, #f472b6); /* Pink Gradient */
+    position: relative;
+}
+
+    .cover-gradient {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 50%;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.5), transparent);
+    }
+
+    .profile-main {
+        position: relative;
+        padding: 0 2rem 2rem;
+        margin-top: -80px;
+    }
+
+    .profile-avatar-wrapper {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+
+    .profile-avatar {
+        width: 160px;
+        height: 160px;
+        border-radius: 50%;
+        border: 4px solid var(--bg-primary);
+        box-shadow: var(--shadow-lg);
+        object-fit: cover;
+    }
+
+    .profile-info {
+        color: var(--text-primary);
+    }
+
+    .profile-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .profile-name {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .profile-actions {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .profile-meta {
+        display: flex;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--text-secondary);
+    }
+
+    .profile-bio {
+        font-size: 1.125rem;
+        line-height: 1.6;
+        color: var(--text-secondary);
+        max-width: 600px;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.625rem 1.25rem;
+        border-radius: 0.5rem;
+        font-weight: 500;
+        font-size: 0.875rem;
+        transition: all 0.2s;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn svg {
+        width: 1.25rem;
+        height: 1.25rem;
+    }
+
+    .btn-primary {
+        background: var(--primary-color);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: var(--primary-dark);
+        transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+    }
+
+    .btn-secondary:hover {
+        background: var(--border-color);
+        transform: translateY(-1px);
+    }
+
+    .btn-danger {
+        background: var(--danger-color);
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background: var(--danger-dark);
+        transform: translateY(-1px);
+    }
+
+    .content-section {
+        background: var(--bg-primary);
+        border-radius: 1rem;
+        padding: 2rem;
+        box-shadow: var(--shadow-lg);
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .section-header h2 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .posts-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 2rem;
+    }
+
+    .post-card {
+        background: var(--bg-primary);
+        border-radius: 1rem;
+        overflow: hidden;
+        box-shadow: var(--shadow);
+        transition: all 0.3s ease;
+    }
+
+    .post-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .post-header {
+        padding: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .post-author {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .author-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .author-info h3 {
+        font-size: 0.875rem;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .author-info span {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+    }
+
+    .dropdown {
+        position: relative;
+    }
+
+    .dropdown-trigger {
+        background: none;
+        border: none;
+        padding: 0.5rem;
+        cursor: pointer;
+        border-radius: 0.5rem;
+        color: var(--text-secondary);
+        transition: all 0.2s;
+    }
+
+    .dropdown-trigger:hover {
+        background: var(--bg-secondary);
+    }
+
+    .dropdown-menu {
+        position: absolute;
+        right: 0;
+        top: 100%;
+        background: var(--bg-primary);
+        border-radius: 0.5rem;
+        box-shadow: var(--shadow-lg);
+        padding: 0.5rem;
+        min-width: 150px;
+        display: none;
+    }
+
+    .dropdown:hover .dropdown-menu {
+        display: block;
+    }
+
+    .dropdown-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem;
+        border-radius: 0.25rem;
+        color: var(--text-primary);
+        background: none;
+        border: none;
+        width: 100%;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .text-danger {
+        color: var(--danger-color);
+    }
+
+    .dropdown-item:hover {
+        background: var(--bg-secondary);
+    }
+
+    .post-image {
+        width: 100%;
+        aspect-ratio: 1;
+    }
+
+    .post-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .post-content {
+        padding: 1rem;
+        font-size: 0.875rem;
+        color: var(--text-primary);
+    }
+
+    .post-footer {
+        padding: 1rem;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .like-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: none;
+        border: none;
+        color: var(--text-secondary);
+        cursor: pointer;
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+        transition: all 0.2s;
+    }
+
+    .like-btn:hover {
+        background: var(--bg-secondary);
+        color: var(--danger-color);
+    }
+
+    .like-btn:hover svg {
+        fill: var(--danger-color);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+    }
+
+    .empty-state-icon {
+        color: var(--text-secondary);
+        margin-bottom: 1.5rem;
+    }
+
+    .empty-state h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-state p {
+        color: var(--text-secondary);
+        margin-bottom: 1.5rem;
+    }
+
+    @media (max-width: 768px) {
+        .profile-container {
+            padding: 1rem;
+        }
+
+        .profile-main {
+            padding: 0 1rem 1rem;
+        }
+
+        .profile-top {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .profile-actions {
+            width: 100%;
+        }
+
+        .btn {
+            flex: 1;
+            justify-content: center;
+        }
+
+        .posts-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (prefers-color-scheme: dark) {
+        :root {
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --bg-primary: #1f2937;
+            --bg-secondary: #374151;
+            --border-color: #4b5563;
+        }
+
+        .profile-cover {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+        }
+    }
+</style>
+
+<script>
+    // Add click event listeners for dropdowns if needed
+    document.addEventListener('DOMContentLoaded', function() {
+        const dropdowns = document.querySelectorAll('.dropdown');
+
+        dropdowns.forEach(dropdown => {
+            const trigger = dropdown.querySelector('.dropdown-trigger');
+            const menu = dropdown.querySelector('.dropdown-menu');
+
+            trigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+            });
+
+            document.addEventListener('click', () => {
+                menu.style.display = 'none';
+            });
+        });
+    });
+</script>
+{% endblock %}

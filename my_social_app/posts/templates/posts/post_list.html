@@ -1,0 +1,342 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="container">
+        <h2 class="feed-title">Feed Page</h2>
+        <p class="feed-subtitle">Explore how world</p>
+
+        <!-- CSRF Token -->
+        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
+        {% for post in posts %}
+            <div class="post-card">
+                <div class="post-header">
+                    <div class="user-info">
+                        <div class="user-avatar">
+                            {% if post.user.profile_picture %}
+                                <img src="{{ post.user.profile_picture.url }}" alt="{{ post.user.username }}'s avatar">
+                            {% else %}
+                                <div class="default-avatar">{{ post.user.username|first|upper }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="user-details">
+                            <strong class="username">@{{ post.user.username }}</strong>
+                            <span class="post-time">Just now</span>
+                        </div>
+                    </div>
+                    <button class="more-options">•••</button>
+                </div>
+
+                {% if post.image %}
+                    <div class="post-image">
+                        <img src="{{ post.image.url }}" alt="Post Image">
+                    </div>
+                {% endif %}
+
+                <div class="post-content">
+                    <p>{{ post.caption }}</p>
+                </div>
+
+                <div class="post-actions">
+                    <div class="action-buttons">
+                        <button class="like-btn" data-post-id="{{ post.id }}">
+                            {% if post.is_liked %}
+                                <span class="heart-icon">❤️</span>
+                            {% else %}
+                                <span class="heart-icon">🤍</span>
+                            {% endif %}
+                        </button>
+                    </div>
+                </div>
+
+                <div class="post-stats">
+                    <span id="likes-count-{{ post.id }}" class="likes-count">{{ post.likes.count }} likes</span>
+                </div>
+            </div>
+        {% empty %}
+            <div class="no-posts">
+                <div class="empty-icon">📭</div>
+                <p class="empty-text">No posts available</p>
+                <p class="empty-subtext">Be the first one to share something amazing!</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    <script>
+        function getCSRFToken() {
+            return document.querySelector("[name=csrfmiddlewaretoken]").value;
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            document.body.addEventListener("click", function (event) {
+                if (event.target.classList.contains("like-btn") || event.target.parentElement.classList.contains("like-btn")) {
+                    let button = event.target.classList.contains("like-btn") ? event.target : event.target.parentElement;
+                    let postId = button.getAttribute("data-post-id");
+                    let heartIcon = button.querySelector(".heart-icon");
+
+                    fetch(`/posts/like/${postId}/`, {
+                        method: "POST",
+                        headers: {
+                            "X-CSRFToken": getCSRFToken(),
+                            "Content-Type": "application/json"
+                        },
+                        credentials: "same-origin"
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        heartIcon.textContent = data.liked ? "❤️" : "🤍";
+                        document.getElementById(`likes-count-${postId}`).textContent = data.likes_count + " likes";
+
+                        // Add animation class
+                        button.classList.add("like-animation");
+                        setTimeout(() => button.classList.remove("like-animation"), 300);
+                    })
+                    .catch(error => console.error("Error:", error));
+                }
+            });
+        });
+    </script>
+
+    <style>
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f6f9fc 0%, #edf2f7 100%);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            color: #2d3748;
+            line-height: 1.5;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .feed-title {
+            font-size: 2rem;
+            font-weight: 800;
+            text-align: center;
+            background: linear-gradient(to right, #6366f1, #ec4899);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .feed-subtitle {
+            text-align: center;
+            color: #6b7280;
+            margin-bottom: 2rem;
+        }
+
+        .post-card {
+            background: white;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .post-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            overflow: hidden;
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .default-avatar {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #6366f1, #ec4899);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1.25rem;
+            text-transform: uppercase;
+        }
+
+        .user-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .username {
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .post-time {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .more-options {
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            color: #6b7280;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: background-color 0.2s ease;
+        }
+
+        .more-options:hover {
+            background-color: #f3f4f6;
+        }
+
+        .post-image {
+            width: 100%;
+            aspect-ratio: 4/3;
+            overflow: hidden;
+        }
+
+        .post-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .post-content {
+            padding: 1rem;
+            color: #4b5563;
+            line-height: 1.5;
+        }
+
+        .post-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.5rem 1rem;
+            border-top: 1px solid #f1f1f1;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .like-btn, .comment-btn, .share-btn, .bookmark-btn {
+            background: none;
+            border: none;
+            padding: 0.5rem;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+            font-size: 1.25rem;
+        }
+
+        .like-btn:hover, .comment-btn:hover, .share-btn:hover, .bookmark-btn:hover {
+            background-color: #f3f4f6;
+            transform: scale(1.1);
+        }
+
+        .like-animation {
+            animation: likeEffect 0.3s ease;
+        }
+
+        @keyframes likeEffect {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .post-stats {
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+
+        .likes-count {
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .dot {
+            color: #d1d5db;
+        }
+
+        .no-posts {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .empty-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .empty-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-subtext {
+            color: #6b7280;
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 1rem 0.5rem;
+            }
+
+            .feed-title {
+                font-size: 1.75rem;
+            }
+
+            .post-card {
+                margin-bottom: 1rem;
+                border-radius: 0.75rem;
+            }
+
+            .post-header {
+                padding: 0.75rem;
+            }
+
+            .user-avatar {
+                width: 32px;
+                height: 32px;
+            }
+
+            .default-avatar {
+                font-size: 1rem;
+            }
+        }
+    </style>
+{% endblock %}

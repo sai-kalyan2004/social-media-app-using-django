@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - New World</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(-45deg, #000428, #004e92, #000428);
+            background-size: 400% 400%;
+            animation: gradientBG 8s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .login-container {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
+            width: 400px;
+            text-align: center;
+            border: 1px solid rgba(0, 255, 255, 0.4);
+            transition: transform 0.3s ease;
+        }
+
+        .login-container:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 25px rgba(0, 255, 255, 1);
+        }
+
+        h2 {
+            color: #00ffff;
+            margin-bottom: 20px;
+            font-size: 28px;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+            letter-spacing: 1px;
+        }
+
+        .form-group {
+            text-align: left;
+            margin-bottom: 18px;
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 6px;
+            color: #00ffff;
+            text-shadow: 0 0 8px rgba(0, 255, 255, 0.7);
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid rgba(0, 255, 255, 0.5);
+            border-radius: 8px;
+            font-size: 16px;
+            background: rgba(0, 0, 0, 0.5);
+            color: #00ffff;
+            box-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            border-color: #00ffff;
+            box-shadow: 0 0 12px rgba(0, 255, 255, 1);
+            outline: none;
+        }
+
+        button {
+            width: 100%;
+            background: linear-gradient(90deg, #00ffff, #0088ff);
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+        }
+
+        button:hover {
+            background: linear-gradient(90deg, #0088ff, #00ffff);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 1);
+        }
+
+        .social-login {
+            margin-top: 15px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .social-btn {
+            width: 48%;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .google {
+            background: #db4437;
+        }
+
+        .facebook {
+            background: #3b5998;
+        }
+
+        .google:hover {
+            background: #c1351d;
+        }
+
+        .facebook:hover {
+            background: #2d4373;
+        }
+
+        .social-btn img {
+            width: 20px;
+            margin-right: 8px;
+        }
+
+        .links {
+            margin-top: 15px;
+            font-size: 15px;
+        }
+
+        .links a {
+            color: #00ffff;
+            text-decoration: none;
+            font-weight: bold;
+            text-shadow: 0 0 5px rgba(0, 255, 255, 0.7);
+        }
+
+        .links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2>Access the New World</h2>
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="id_username">Username</label>
+                {{ form.username }}
+            </div>
+
+            <div class="form-group">
+                <label for="id_password">Password</label>
+                {{ form.password }}
+            </div>
+
+            <button type="submit">Login</button>
+        </form>
+         <div class="links">
+            <p>New user? <a href="{% url 'register' %}">Join now</a></p>
+        </div>
+    </div>
+</body>
+</html>

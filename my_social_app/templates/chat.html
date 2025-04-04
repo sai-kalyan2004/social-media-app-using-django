@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        .chat-box { width: 300px; height: 400px; overflow-y: auto; border: 1px solid #ccc; margin: 20px auto; padding: 10px; }
+        .message { margin: 5px 0; padding: 10px; border-radius: 5px; }
+        .sent { background-color: #1877f2; color: white; text-align: right; }
+        .received { background-color: #ccc; color: black; text-align: left; }
+        input, button { margin-top: 10px; padding: 10px; }
+    </style>
+</head>
+<body>
+    <h2>Chat with a User</h2>
+    <button onclick="startNewChat()">New Chat</button>
+    <div class="chat-box" id="chatBox"></div>
+    <input type="text" id="messageInput" placeholder="Type a message">
+    <button onclick="sendMessage()">Send</button>
+
+    <script>
+        let ws;
+        let receiverRoom = null;
+
+        function connectWebSocket() {
+            ws = new WebSocket(`ws://${window.location.host}/ws/chat/`);
+
+            ws.onmessage = function(event) {
+                let data = JSON.parse(event.data);
+                let chatBox = document.getElementById('chatBox');
+                let messageDiv = document.createElement('div');
+                messageDiv.classList.add('message', data.sender === "{{ user.username }}" ? 'sent' : 'received');
+                messageDiv.innerText = `${data.sender}: ${data.message}`;
+                chatBox.appendChild(messageDiv);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            };
+        }
+
+        function sendMessage() {
+            let messageInput = document.getElementById('messageInput');
+            let message = messageInput.value.trim();
+            if (message && ws) {
+                ws.send(JSON.stringify({ "message": message, "receiver_room": receiverRoom }));
+                messageInput.value = '';
+            }
+        }
+
+        function startNewChat() {
+            receiverRoom = null;
+            document.getElementById('chatBox').innerHTML = '';  // Clear chat
+        }
+
+        connectWebSocket();
+    </script>
+</body>
+</html>
